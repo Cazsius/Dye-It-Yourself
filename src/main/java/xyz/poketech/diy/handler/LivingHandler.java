@@ -23,22 +23,17 @@ public class LivingHandler {
     public static final String NEXT_DYE_KEY = "nextDye";
 
     @SubscribeEvent
-    public static void onEntitySpawn(LivingSpawnEvent.EnteringChunk event) {
+    public static void onEntityEnterWorld(EntityJoinWorldEvent event) {
         if (event.getEntity() instanceof SheepEntity) {
+            //add eat flower goal
             SheepEntity sheep = ((SheepEntity) event.getEntity());
-
             if (DyeItYourself.CONFIG.sheepEatFlowers.get()) {
                 sheep.goalSelector.addGoal(5, new EatFlowerGoal(sheep));
             }
-        }
-    }
 
-    @SubscribeEvent
-    public static void onEntityEnterWorld(EntityJoinWorldEvent event) {
-        //Sync the sheep color on the client
-        if(event.getWorld().isRemote) {
-            if(event.getEntity() instanceof SheepEntity) {
-                DyeItYourself.NETWORK.sendToServer(new RequestColorPacket(event.getEntity().getEntityId()));
+            //Sync the sheep color on the client
+            if (event.getWorld().isRemote) {
+                DyeItYourself.NETWORK.sendToServer(new RequestColorPacket(sheep.getEntityId()));
             }
         }
     }
